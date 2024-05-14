@@ -16,30 +16,48 @@
 
     % Authors
     \author{\textit{Kalos Lazo, Lucas Carranza, Benjamín Soto, José Osnayo}}
-    % \author{
-    %     \IEEEauthorblockN{Kalos Lazo}
-    %     \IEEEauthorblockA{\textit{kalos.lazo@utec.edu.pe}}
-    %     \and
-    %     \IEEEauthorblockN{Lucas Carranza}
-    %     \IEEEauthorblockA{\textit{lucas.carranza@utec.edu.pe}}
-    %     \and
-    %     \IEEEauthorblockN{Benjamín Soto}
-    %     \IEEEauthorblockA{\textit{benjamín.soto@utec.edu.pe}}
-    %     \and
-    %     \IEEEauthorblockN{José Osnayo}
-    %     \IEEEauthorblockA{\textit{jose.osnayo@utec.edu.pe}}
-    % }
 \maketitle
 
-\begin{abstract}
-En el presente documento se discute acerca de la resolución de un problema de clasificación supervisada a partir de un estudio realizado a un grupo de voluntarios de entre $19$ y $48$, mientras realizaban actividades cotidianas: \textit{caminar, subir escaleras, bajar escaleras, sentarse, levantarse y acostarse} se obtuvieron datos del acelómetro y giroscopio embebido sus teléfonos inteligentes: \textit{Samsung Galaxy SII}. Los datos fueron convertidos usando la librería TsFresh para extraer las características de las series temporales más importantes y de manera sencilla. Posteriormente se 
-\end{abstract}
-
 \section{Introduction}
-Project description
+En el presente documento se discute acerca de la resolución de un problema de clasificación supervisada a partir de un estudio realizado a un grupo de voluntarios de entre $19$ y $48$, mientras realizaban actividades cotidianas: \textit{caminar, subir escaleras, bajar escaleras, sentarse, levantarse y acostarse} se obtuvieron datos del acelómetro y giroscopio embebido sus teléfonos inteligentes: \textit{Samsung Galaxy SII}. Los datos fueron convertidos usando la librería TsFresh para extraer las características de las series temporales más importantes y de manera sencilla. Posteriormente se utilizarón dos modelos de clasificación de los cuales se comparan y discuten sus resultados.
 
 \section{Conjunto de Datos}
-Exploration and analysis of the dataset
+% En este informe, se presenta un analisis exploratorio de los datos que se utilizarán posteriormente en la integración de un modelo de machine learning. El objetivo principal del proyecto es predecir el valor de  presupuesto institucional modificado (MTO_PIM) utilizando modelos de regresión lineal o no lineal con regularización L1 y L2. Se explorarán las relaciones entre las variables disponibles y el objetivo de predicción para comprender mejor el conjunto de datos y prepararlos para la modelización. El propósito final es encontrar el mejor modelo que se adapte a la estructura de los datos y que sea capaz de hacer predicciones precisas sobre el MTO_PIM.
+Se presenta un análisis exploratorio de los datos que se utilizaran posteriormente en la integración de dos modelos de Machine Learning. El objetivo principal será predecir la actividad que realiza un usuario a partir de los datos que indica su teléfono inteligente.
+
+Los datos utilizados en este proyecto contienen información extraída de tecnología de su teléfono: \textit{acelerómetro y giroscópio}. Esta información se provee con la extensión \texttt{.h5} que indica que es un formato jerárquico \texttt{HDF} y sirve para almacenar gran cantidad de datos. En este caso trae consigo, en su jerarquía, 9 datasets que indican lo siguiente:
+
+\begin{table}[htbp]
+    \caption{Descripción de Variables}
+    \begin{center}
+        \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Variable} & \textbf{Descripción} \\
+        \hline
+        \texttt{body\_acc\_x} & Señal de aceleración del cuerpo en el eje X.\\
+        \hline
+        \texttt{body\_acc\_y} & Señal de aceleración del cuerpo en el eje Y.\\
+        \hline
+        \texttt{body\_acc\_z} & Señal de aceleración del cuerpo en el eje Z.\\
+        \hline
+        \texttt{body\_gyro\_x} & Velocidad angular medida en el eje X.\\
+        \hline
+        \texttt{body\_gyro\_y} & Velocidad angular medida en el eje Y. \\
+        \hline
+        \texttt{body\_gyro\_z} & Velocidad angular medida en el eje Z. \\
+        \hline
+        \texttt{total\_acc\_x} & Señal de aceleración total en el eje X. \\
+        \hline
+        \texttt{total\_acc\_y} & Señal de aceleración total en el eje Y. \\
+        \hline
+        \texttt{total\_acc\_z} & Señal de aceleración total en el eje Z. \\
+        \hline
+        \texttt{y} & Etiquetas de actividad del 1 al 6. \\
+        \hline
+        \end{tabular}
+        \label{tab1}
+    \end{center}
+\end{table}
 
 \section{Metodología}
 Explanation of the model, loss functions, and regularization techniques
