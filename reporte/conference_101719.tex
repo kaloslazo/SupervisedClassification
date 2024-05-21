@@ -15,17 +15,15 @@
     \title{Human Activity Recognition Using Smartphones\\}
 
     % Authors
-    \author{\textit{Kalos Lazo, Lucas Carranza, Benjamín Soto, José Osnayo}}
+    \author{\textit{Kalos Lazo (100\%), Lucas Carranza (100\%), Benjamín Soto (100\%), José Osnayo}}
 \maketitle
 
 \section{Introduction}
-En el presente documento se discute acerca de la resolución de un problema de clasificación supervisada a partir de un estudio realizado a un grupo de voluntarios de entre $19$ y $48$, mientras realizaban actividades cotidianas: \textit{caminar, subir escaleras, bajar escaleras, sentarse, levantarse y acostarse} se obtuvieron datos del acelómetro y giroscopio embebido sus teléfonos inteligentes: \textit{Samsung Galaxy SII}. Los datos fueron convertidos usando la librería TsFresh para extraer las características de las series temporales más importantes y de manera sencilla. Posteriormente se utilizarón dos modelos de clasificación de los cuales se comparan y discuten sus resultados.
+En el presente documento se discute acerca de la resolución de un problema de clasificación supervisada a partir de un estudio realizado a un grupo de voluntarios de entre $19$ y $48$, mientras realizaban actividades cotidianas: \textit{caminar, subir escaleras, bajar escaleras, sentarse, levantarse y acostarse} se obtuvieron datos del acelómetro y giroscopio embebido sus teléfonos inteligentes: \textit{Samsung Galaxy SII}. Los datos fueron convertidos usando la librería TsFresh para extraer las características de las series temporales más importantes. Finalmente se usaron dos modelos de clasificación para predecir la actividad realizada según las características de la serie temporal.
 
 \section{Conjunto de Datos}
-% En este informe, se presenta un analisis exploratorio de los datos que se utilizarán posteriormente en la integración de un modelo de machine learning. El objetivo principal del proyecto es predecir el valor de  presupuesto institucional modificado (MTO_PIM) utilizando modelos de regresión lineal o no lineal con regularización L1 y L2. Se explorarán las relaciones entre las variables disponibles y el objetivo de predicción para comprender mejor el conjunto de datos y prepararlos para la modelización. El propósito final es encontrar el mejor modelo que se adapte a la estructura de los datos y que sea capaz de hacer predicciones precisas sobre el MTO_PIM.
-Se presenta un análisis exploratorio de los datos que se utilizaran posteriormente en la integración de dos modelos de Machine Learning. El objetivo principal será predecir la actividad que realiza un usuario a partir de los datos que indica su teléfono inteligente.
-
-Los datos utilizados en este proyecto contienen información extraída de tecnología de su teléfono: \textit{acelerómetro y giroscópio}. Esta información se provee con la extensión \texttt{.h5} que indica que es un formato jerárquico \texttt{HDF} y sirve para almacenar gran cantidad de datos. En este caso trae consigo, en su jerarquía, 9 datasets que indican lo siguiente:
+\subsection{Exploración del Dataset}
+Los datos utilizados en este proyecto contienen información extraída del teléfono: \textit{acelerómetro y giroscopio}. Esta información se provee en un archivo de extensión \texttt{.h5} que indica que es un formato jerárquico \texttt{HDF} y sirve para múltiples datasets. Para la data de entrenamiento se incluyeron consigo, en su jerarquía, 10 datasets con 7352 entradas que indican lo siguiente:
 
 \begin{table}[htbp]
     \caption{Descripción de Variables}
@@ -59,21 +57,55 @@ Los datos utilizados en este proyecto contienen información extraída de tecnol
     \end{center}
 \end{table}
 
+Cada dataset (excepto \texttt{y}) cuenta con 128 columnas, donde cada una corresponde a la medida de cada variable en cierta unidad de tiempo.
+Para la data de testing se incluyeron las mismas variables a excepción de \texttt{y} con 2947 entradas.
+
+\subsection{Extracción de Features}
+Para poder utilizar los datos para realizar la clasificación necesitamos convertir las series temporales a un conjunto de características. Para realizar esto se usó la librería TsFresh con su función \texttt{extract\_features} con los parámetros mínimos. Esto convirtió cada dataset de 128 timestamps a 9 características, por lo que se concatenaron para obtener un dataset de entrenamiento y testing de 81 características.
+
+\textbf{PENDIENTE: Listar características extraídas en el anexo}
+
 \section{Metodología}
-Explanation of the model, loss functions, and regularization techniques
+% Explanation of the model, loss functions, and regularization techniques
+Se utilizaron principalmente dos modelos en este proyecto: KNN usando KdTree y Regresión Logística con función Softmax.
+
+\subsection{Justificación}
+La razón por la que se usó KNN fue por la facilidad de su implementación para clasificación de múltiples clases, y se utilizó un KdTree para garantizar su eficiencia, ya que se deben calcular las distancias de más 2000 puntos de 81 dimensiones. Debido a que el número de dimensiones no es demasiado grande no hay problema al calcular las distancias.
+
+Se probó la clasificación utilizando Decision Tree. Sin embargo debido a que los datos eran continuos, el splitting óptimo fue difícil de calcular. Esto resultó en una predicción sub-óptima con precisión de testing inferior a 20\%. Esto acompañado con el hecho de que se solían predecir solo 3 de las 6 clases, sugiere que este modelo generaba \textit{overfitting}.
+
+Por ende, para aprovechar los datos continuos se utilizó Regresión Logística. Sin embargo, debido a que el modelo visto en clase solo permite clasificación binaria, se implementó una función Softmax para reemplazar la Sigmoidea, la cual permite realizar clasificación Multinomial.
+
+\subsection{KNN}
+\subsection{Regresión Logística}
 
 \section{Implementación}
-Include the link to Colab or GitHub where the implementation can be found, avoiding direct
-code placement in the report. Define a seed to replicate the results. [Optional] Relevant implementation
-details can also be included (error handling, parallelization, etc.).
+% Include the link to Colab or GitHub where the implementation can be found, avoiding direct
+% code placement in the report. Define a seed to replicate the results. [Optional] Relevant implementation
+% details can also be included (error handling, parallelization, etc.).
+El código del proyecto se encuentra en el siguiente Repositorio de GitHub:
+
+
+\textbf{Detalles de implementación:}
+
+Durante la experimentación se usó paralelización al momento de realizar la extracción de features. Para la entrega final se eliminó la paralelización para garantizar la integridad y precisión de las características.
+
+Se fijó la semilla aleatoria para ...
 
 \section{Experimentación}
-Present results with graphs and/or tables, avoiding terminal screenshots
+% Present results with graphs and/or tables, avoiding terminal screenshots
+Se experimentaron principalmente con los dos modelos. Se utilizó K-Fold Cross-Validation para calcular la precisión de entrenamiento y validación usando múltiples Bases de Datos.
+
+\subsection{Experimentación con KNN}
+
+\subsection{Experimentación con Regresión Logística}
+
 
 \section{Discusión}
-Interpretation of the obtained results and their relationship with the learned theory
+% Interpretation of the obtained results and their relationship with the learned theory
+
 
 \section{Conclusiones}
-Summary of results, limitations, and recommendations
+% Summary of results, limitations, and recommendations
 
 \end{document}
