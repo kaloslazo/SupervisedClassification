@@ -60,17 +60,55 @@ Los datos utilizados en este proyecto contienen información extraída del telé
 Cada dataset (excepto \texttt{y}) cuenta con 128 columnas, donde cada una corresponde a la medida de cada variable en cierta unidad de tiempo.
 Para la data de testing se incluyeron las mismas variables a excepción de \texttt{y} con 2947 entradas.
 
+\subsection{Análisis de Frecuencias}
+Analizamos las frecuencias de cada clase utilizando la librería Seaborne para graficar el histograma.
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{class_freq.png}
+    \caption{Histograma de Frecuencias de Clases}
+    \label{fig1}
+\end{figure}
+Observamos que las frecuencias son casi equivalentes, por lo que no hay que tener consideraciones especiales por desbalanceo.
+
 \subsection{Extracción de Features}
 Para poder utilizar los datos para realizar la clasificación necesitamos convertir las series temporales a un conjunto de características. Para realizar esto se usó la librería TsFresh con su función \texttt{extract\_features} con los parámetros mínimos. Esto convirtió cada dataset de 128 timestamps a 9 características, por lo que se concatenaron para obtener un dataset de entrenamiento y testing de 81 características.
 
-\textbf{PENDIENTE: Listar características extraídas en el anexo}
+\begin{table}[htbp]
+    \caption{Descripción de Características}
+    \begin{center}
+        \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Característica} & \textbf{Descripción} \\
+        \hline
+        \texttt{sum\_values} & Suma de valores de la serie temporal.\\
+        \hline
+        \texttt{median} & Mediana de los valores.\\
+        \hline
+        \texttt{mean} & Media aritmética de los valores.\\
+        \hline
+        \texttt{standard\_deviation} & Desviación estándar de los valores.\\
+        \hline
+        \texttt{variance} & Varianza de los valores. \\
+        \hline
+        \texttt{root\_mean\_square} & Raíz de la media de los cuadrados. \\
+        \hline
+        \texttt{maximum} & Valor máximo de la serie temporal. \\
+        \hline
+        \texttt{absolute\_maximum} & Valor máximo absoluot de la serie. \\
+        \hline
+        \texttt{minimum} & Valor mínimo de la serie temporal. \\
+        \hline
+        \end{tabular}
+        \label{tab2}
+    \end{center}
+\end{table}
 
 \section{Metodología}
 % Explanation of the model, loss functions, and regularization techniques
-Se utilizaron principalmente dos modelos en este proyecto: KNN usando KdTree y Regresión Logística con función Softmax.
+Se utilizaron principalmente dos modelos en este proyecto: KNN usando K-DTree y Regresión Logística con función Softmax.
 
 \subsection{Justificación}
-La razón por la que se usó KNN fue por la facilidad de su implementación para clasificación de múltiples clases, y se utilizó un KdTree para garantizar su eficiencia, ya que se deben calcular las distancias de más 2000 puntos de 81 dimensiones. Debido a que el número de dimensiones no es demasiado grande no hay problema al calcular las distancias.
+La razón por la que se usó KNN fue por la facilidad de su implementación para clasificación de múltiples clases, y se utilizó un KD-Tree para garantizar su eficiencia, ya por el contrario se deben calcular las distancias entre más 7000 puntos de 81 dimensiones. Finalmente, debido a que el número de dimensiones no es demasiado grande, no sufrimos del caso de \textit{Curse of Dimensionality}.
 
 Se probó la clasificación utilizando Decision Tree. Sin embargo debido a que los datos eran continuos, el splitting óptimo fue difícil de calcular. Esto resultó en una predicción sub-óptima con precisión de testing inferior a 20\%. Esto acompañado con el hecho de que se solían predecir solo 3 de las 6 clases, sugiere que este modelo generaba \textit{overfitting}.
 
@@ -78,6 +116,17 @@ Por ende, para aprovechar los datos continuos se utilizó Regresión Logística.
 
 \subsection{KNN}
 \subsection{Regresión Logística}
+La Regresión Logística usando Softmax requiere utilizar funciones diferentes a las vistas en clase. A continuación se explicarán las fórmulas que difieren de la clasificación binaria:
+\begin{itemize}
+\item Función Softmax:
+$$softmax(s_i) = \frac{e^{s_i}}{\sum_j^c e^{s_j}}$$
+
+\item Función Loss:
+A diferencia de la clasificación binaria, donde se usa \textit{Binary Cross Entropy}, en la Regresión Multinomial requerimos de la \textit{Cross Entropy}
+\item Derivadas:
+\item Regularización:
+\end{itemize}
+
 
 \section{Implementación}
 % Include the link to Colab or GitHub where the implementation can be found, avoiding direct
@@ -90,13 +139,23 @@ El código del proyecto se encuentra en el siguiente Repositorio de GitHub:
 
 Durante la experimentación se usó paralelización al momento de realizar la extracción de features. Para la entrega final se eliminó la paralelización para garantizar la integridad y precisión de las características.
 
-Se fijó la semilla aleatoria para ...
+Se fijó la semilla aleatoria para permitir la replicación de resultados.
+
+Se mantuvo en el código la implementación del Decision Tree como evidencia de la experimentación. Sin embargo, como se mencionó previamente, su performance no es representativo de lo logrado en el proyecto por ser sub-óptima.
 
 \section{Experimentación}
 % Present results with graphs and/or tables, avoiding terminal screenshots
 Se experimentaron principalmente con los dos modelos. Se utilizó K-Fold Cross-Validation para calcular la precisión de entrenamiento y validación usando múltiples Bases de Datos.
 
 \subsection{Experimentación con KNN}
+Debido a la naturaleza del algoritmo KNN, el único hiper-parámetro alterable es \texttt{k}, o el número de vecinos más cercanos considerados para la predicción. Por este motivo se probaron distintos valores de k para encontrar el punto óptimo, empezando con \texttt{k=4} e incrementando. Consideramos que valores muy pequeños como \texttt{1,2} resultan en una predicción muy volátil, por lo que los evitamos por completo.
+
+\begin{itemize}
+\item k=4
+\item k=5
+\item k=6
+\item k=7
+\end{itemize}
 
 \subsection{Experimentación con Regresión Logística}
 
