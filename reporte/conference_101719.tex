@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{hyperref}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -61,7 +62,7 @@ Cada dataset (excepto \texttt{y}) cuenta con 128 columnas, donde cada una corres
 Para la data de testing se incluyeron las mismas variables a excepción de \texttt{y} con 2947 entradas.
 
 \subsection{Análisis de Frecuencias}
-Analizamos las frecuencias de cada clase utilizando la librería Seaborne para graficar el histograma.
+Analizamos las frecuencias de cada clase utilizando la librería Seaborn para graficar el histograma.
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{class_freq.png}
@@ -94,7 +95,7 @@ Para poder utilizar los datos para realizar la clasificación necesitamos conver
         \hline
         \texttt{maximum} & Valor máximo de la serie temporal. \\
         \hline
-        \texttt{absolute\_maximum} & Valor máximo absoluot de la serie. \\
+        \texttt{absolute\_maximum} & Valor máximo absoluto de la serie. \\
         \hline
         \texttt{minimum} & Valor mínimo de la serie temporal. \\
         \hline
@@ -108,23 +109,49 @@ Para poder utilizar los datos para realizar la clasificación necesitamos conver
 Se utilizaron principalmente dos modelos en este proyecto: KNN usando K-DTree y Regresión Logística con función Softmax.
 
 \subsection{Justificación}
-La razón por la que se usó KNN fue por la facilidad de su implementación para clasificación de múltiples clases, y se utilizó un KD-Tree para garantizar su eficiencia, ya por el contrario se deben calcular las distancias entre más 7000 puntos de 81 dimensiones. Finalmente, debido a que el número de dimensiones no es demasiado grande, no sufrimos del caso de \textit{Curse of Dimensionality}.
+La razón por la que se usó KNN fue por la facilidad de su implementación para clasificación de múltiples clases, y se utilizó un KD-Tree para garantizar su eficiencia, ya por el contrario se deben calcular las distancias entre más 7000 puntos de 81 dimensiones. Finalmente, debido a que el número de dimensiones no es demasiado grande, no sufrimos del caso de \textit{Curse of Dimensionality}, por lo que es un modelo viable para este caso.
 
-Se probó la clasificación utilizando Decision Tree. Sin embargo debido a que los datos eran continuos, el splitting óptimo fue difícil de calcular. Esto resultó en una predicción sub-óptima con precisión de testing inferior a 20\%. Esto acompañado con el hecho de que se solían predecir solo 3 de las 6 clases, sugiere que este modelo generaba \textit{overfitting}.
+Asimismo, se probó la clasificación utilizando Decision Tree. Sin embargo debido a que los datos eran continuos en vez de discretos, el punto de splitting óptimo fue difícil de calcular. Esto resultó en una predicción sub-óptima con precisión de testing inferior a 20\%. Esto acompañado con el hecho de que se solían predecir solo 3 de las 6 clases, sugiere que este modelo generaba \textit{overfitting} con sesgo hacia las ciertas clases. Esto nos llevó a descartar este modelo para este trabajo, y proseguir con otros.
 
-Por ende, para aprovechar los datos continuos se utilizó Regresión Logística. Sin embargo, debido a que el modelo visto en clase solo permite clasificación binaria, se implementó una función Softmax para reemplazar la Sigmoidea, la cual permite realizar clasificación Multinomial.
+Finalmente, para aprovechar los datos continuos se utilizó Regresión Logística. Sin embargo, debido a que el modelo visto en clase solo permite clasificación binaria, se implementó una función Softmax para reemplazar la función Sigmoide, lo cual permite realizar clasificación Multinomial. A diferencia del KNN, este modelo sí requiere de entrenamiento, por lo que para garantizar su eficiencia se realizó una experimentación extensiva.
 
 \subsection{KNN}
+\textbf{Falta AQUI}
+
 \subsection{Regresión Logística}
 La Regresión Logística usando Softmax requiere utilizar funciones diferentes a las vistas en clase. A continuación se explicarán las fórmulas que difieren de la clasificación binaria:
 \begin{itemize}
-\item Función Softmax:
-$$softmax(s_i) = \frac{e^{s_i}}{\sum_j^c e^{s_j}}$$
+\item \textbf{One-hot encoding:}
+Para poder aplicar las funciones de Loss y las derivadas al igual que en Regresión Logística binaria, necesitamos codificar nuestro vector de clases de tal manera que el valor de $y$ sea 1 si la clase predicha sea correcta, y 0 si es cualquier otra clase diferente. Por este motivo utilizamos \textit{One-hot encoding}, donde hay tantas columnas como clases. Cada fila $y_i$ tiene el valor de 1 en la columna de la predicción correcta, y 0 en todas las demás.
 
-\item Función Loss:
-A diferencia de la clasificación binaria, donde se usa \textit{Binary Cross Entropy}, en la Regresión Multinomial requerimos de la \textit{Cross Entropy}
-\item Derivadas:
-\item Regularización:
+\item \textbf{Función Softmax:}
+Esta es la función que reemplaza a la función sigmoide. Matemáticamente, este método sólo extiende la fórmula de regresión logística para $k$ clases. Toma como entrada el vector $z_i$ que corresponde al $x_i$ a predecir, y retorna un vector de las probabilidades de que la entrada pertenezca a cada clase. La suma de las probabilidades de todas las clases siempre suma 1.
+
+\[s(z_i) = \frac{e^{z_i}}{\sum_j^K e^{z_j}}\]
+
+Siendo $K$ el número de clases de nuestro dataset.
+La manera en la que funciona es la siguiente:
+
+\[P\{y_i=k\} = \frac{e^{w_kx_i}}{\sum_j^K e^{w_jx_i}}\]
+
+Por lo que obtenemos la probabilidad de que la clase a predecir sea $k$, para cada clase posible. Observamos entonces que $z$ es el producto punto entre los pesos y $x$. Al obtener el valor máximo de las probabilidades, obtenemos la clase de la predicción.
+\vspace{0.5cm}
+\item \textbf{Función Loss:}
+A diferencia de la clasificación binaria, donde se usa \textit{Binary Cross Entropy}, en la Regresión Multinomial requerimos de la \textit{Cross Entropy}, que es el equivalente gracias al \textit{One-hot encoding}, solo que funciona para $k$ clases en vez de sólo 2. Solo cuando la precisión sea correcta, $y$ valdrá 1, y valdrá 0 para todas las demás predicciones.
+\[\mathcal{L} = -\sum_{i=1}^{n}y_i \cdot log(s_i)\]
+
+Para evitar errores por calcular el logaritmo de $0$, utilizamos un valor epsilon muy pequeño para compensar.
+
+\item \textbf{Derivadas:}
+No se modificaron las derivadas de las vistas en clase para Regresión Logística binaria. Como se utiliza \textit{One-hot encoding}, podemos utilizar el principio usado en \textit{Binary Cross Entropy} y aplicarlo para \textit{Cross Entropy} multiclase. Esto nos permite mantener la misma fórmula.
+\[\frac{\delta\mathcal{L}}{\delta W} = \frac{1}{n}\sum_{i=1}^n (y_i - \hat{y_i})\cdot (-x_{ij})\]
+
+\item \textbf{Regularización:}
+Para prevenir overfitting en el modelo, se agregó regularización L2 (Ridge) a la función Loss y a las derivadas. Para realizar esto se le suma el siguiente término a la función Loss:
+\[\frac{\lambda}{2n} ||W||_2^2\]
+Y se suma el siguiente término a las derivadas:
+\[\frac{\lambda}{n} W\]
+
 \end{itemize}
 
 
@@ -132,39 +159,56 @@ A diferencia de la clasificación binaria, donde se usa \textit{Binary Cross Ent
 % Include the link to Colab or GitHub where the implementation can be found, avoiding direct
 % code placement in the report. Define a seed to replicate the results. [Optional] Relevant implementation
 % details can also be included (error handling, parallelization, etc.).
-El código del proyecto se encuentra en el siguiente Repositorio de GitHub:
+El código documentado del proyecto se encuentra en el siguiente 
+\href{https://github.com/kaloslazo/SupervisedClassification}{Repositorio de Github}
 
 
-\textbf{Detalles de implementación:}
+\noindent \textbf{Detalles de implementación:}
+\begin{itemize}
+\item Durante la experimentación se usó paralelización al momento de realizar la extracción de features. Para la entrega final se eliminó la paralelización para garantizar la integridad y precisión de las características.
 
-Durante la experimentación se usó paralelización al momento de realizar la extracción de features. Para la entrega final se eliminó la paralelización para garantizar la integridad y precisión de las características.
+\item Se fijó la semilla aleatoria para permitir la replicación de resultados.
 
-Se fijó la semilla aleatoria para permitir la replicación de resultados.
-
-Se mantuvo en el código la implementación del Decision Tree como evidencia de la experimentación. Sin embargo, como se mencionó previamente, su performance no es representativo de lo logrado en el proyecto por ser sub-óptima.
-
+\item Se mantuvo en el código la implementación del Decision Tree como evidencia de la experimentación. Sin embargo, como se mencionó previamente, su performance no es representativo de lo logrado en el proyecto por ser sub-óptima. No se usó en el proyecto más que para justificar el uso de los otros modelos por descarte del uso de este mismo.
+\end{itemize}
 \section{Experimentación}
 % Present results with graphs and/or tables, avoiding terminal screenshots
-Se experimentaron principalmente con los dos modelos. Se utilizó K-Fold Cross-Validation para calcular la precisión de entrenamiento y validación usando múltiples Bases de Datos.
+Se experimentaron principalmente con los dos modelos mencionados. Se utilizó K-Fold Cross-Validation con 10 pliegues para calcular la precisión de entrenamiento y validación usando múltiples Bases de Datos. Se justifican los parámetros usados y se exponen los hallazgos a continuación.
 
 \subsection{Experimentación con KNN}
-Debido a la naturaleza del algoritmo KNN, el único hiper-parámetro alterable es \texttt{k}, o el número de vecinos más cercanos considerados para la predicción. Por este motivo se probaron distintos valores de k para encontrar el punto óptimo, empezando con \texttt{k=4} e incrementando. Consideramos que valores muy pequeños como \texttt{1,2} resultan en una predicción muy volátil, por lo que los evitamos por completo.
+Debido a la naturaleza del algoritmo KNN, el único hiper-parámetro alterable es $k$, o el número de vecinos más cercanos considerados para la predicción. Por este motivo se probaron distintos valores de $k$ para encontrar el punto óptimo, empezando con $k=4$ e incrementando. Consideramos que valores muy pequeños como 1, 2 resultan en una predicción muy volátil, por lo que se evitaron por completo.
+
+A continuación, los resultados obtenidos con distintos valores de $k$:
 
 \begin{itemize}
-\item k=4
-\item k=5
-\item k=6
-\item k=7
+\item $k=4$:
+\item $k=5$:
+\item $k=6$:
+\item $k=7$:
 \end{itemize}
 
 \subsection{Experimentación con Regresión Logística}
+En el caso de la Regresión Logística, contamos con tres parámetros que podemos modificar. El número de epochs, el parámetro de aprendizaje $\alpha$ y el termino de regularización L2 (Ridge) $\lambda$. El número de epochs es un parámetro indirecto (no afecta al modelo directamente), pues con un valor suficientemente alto se llegan a los mismos resultados. Por este motivo lo fijamos en 10mil epochs para la experimentación. Los otros parámetros se encuentran entre 0 y 1, pero se prefieren valores más cercanos a 0. En el caso de $\alpha$, para permitir \textit{fine-tuning} del modelo y evitar saltos grandes, y en el caso de $\lambda$, para evitar \textit{underfitting} por un parámetro de regularización muy grande.
 
+A continuación, los valores obtenidos con distintas combinaciones de $\alpha$ y $\lambda$:
+
+\begin{itemize}
+\item $\alpha=0.02$, $\lambda=0.1$:
+
+\end{itemize}
 
 \section{Discusión}
 % Interpretation of the obtained results and their relationship with the learned theory
+Tras haber realizado la experimentación, discutiremos los resultados obtenidos.
 
+\begin{itemize}
+\item 
+\end{itemize}
 
 \section{Conclusiones}
 % Summary of results, limitations, and recommendations
+\begin{enumerate}
+\item 
+\end{enumerate}
 
 \end{document}
